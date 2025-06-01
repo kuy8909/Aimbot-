@@ -1,0 +1,67 @@
+getgenv().AimbotEnabled = true
+getgenv().AimPart = "Head"
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- วงกลม RGB
+local circle = Drawing.new("Circle")
+circle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+circle.Radius = 50
+circle.Thickness = 3
+circle.Filled = false
+circle.Transparency = 1
+circle.Visible = true
+
+-- จุดกลาง
+local dot = Drawing.new("Circle")
+dot.Position = circle.Position
+dot.Radius = 3 -- ขนาดจุดกลาง
+dot.Color = Color3.fromRGB(255, 255, 255)
+dot.Thickness = 2
+dot.Filled = true
+dot.Transparency = 1
+dot.Visible = true
+
+-- ฟังก์ชัน RGB
+local function getRainbowColor(speed)
+	local t = tick() * (speed or 1)
+	return Color3.fromHSV(t % 1, 1, 1)
+end
+
+-- หาเป้าหมายใกล้สุด
+local function GetClosestPlayer()
+	local closest = nil
+	local shortest = math.huge
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(getgenv().AimPart) then
+			local pos = player.Character[getgenv().AimPart].Position
+			local distance = (Camera.CFrame.Position - pos).Magnitude
+			if distance < shortest then
+				shortest = distance
+				closest = player
+			end
+		end
+	end
+	return closest
+end
+
+-- อัปเดตตำแหน่งวงกลมและจุดทุกเฟรม
+RunService.RenderStepped:Connect(function()
+	local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+	circle.Position = center
+	circle.Color = getRainbowColor(0.5)
+
+	dot.Position = center
+	dot.Color = Color3.fromRGB(255, 255, 255)
+
+	if getgenv().AimbotEnabled then
+		local target = GetClosestPlayer()
+		if target and target.Character and target.Character:FindFirstChild(getgenv().AimPart) then
+			local part = target.Character[getgenv().AimPart]
+			Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
+		end
+	end
+end)
