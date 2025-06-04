@@ -1,0 +1,57 @@
+-- FPS Boost Script แบบไม่ทำให้หน้าจอขาว แต่ลดของหนัก ๆ
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+
+-- ปรับแสงให้อ่อนลงและสว่างขึ้นเล็กน้อย
+Lighting.Brightness = 2
+Lighting.ClockTime = 14
+Lighting.FogEnd = 100000
+Lighting.GlobalShadows = false
+Lighting.OutdoorAmbient = Color3.fromRGB(150, 150, 150)
+
+-- ลบ Effects ที่กินทรัพยากร
+for _, v in pairs(Lighting:GetChildren()) do
+    if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") then
+        v:Destroy()
+    end
+end
+
+-- ลบ Accessories (หมวก, แว่น, หน้ากาก ฯลฯ) + ผม + หน้าตา
+local function CleanCharacter(char)
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("Accessory") or v:IsA("Decal") and v.Name == "face" or v:IsA("ShirtGraphic") then
+            v:Destroy()
+        end
+    end
+end
+
+-- ใช้กับทุกผู้เล่น (รวมถึงตัวเราเอง)
+for _, player in pairs(Players:GetPlayers()) do
+    if player.Character then
+        CleanCharacter(player.Character)
+    end
+    player.CharacterAdded:Connect(CleanCharacter)
+end
+
+-- ลบ Meshes, Textures ที่ไม่จำเป็นใน Map (ไม่ลบทุกอย่างเพื่อไม่ให้เกมพัง)
+for _, obj in pairs(workspace:GetDescendants()) do
+    if obj:IsA("Texture") or obj:IsA("Decal") or obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
+        obj:Destroy()
+    end
+end
+
+-- ปิด Shadows จากตัวกล้อง
+if workspace:FindFirstChild("Camera") then
+    workspace.CurrentCamera:ClearAllChildren()
+end
+
+-- ปิด Water Reflections
+if workspace.Terrain then
+    workspace.Terrain.WaterWaveSize = 0
+    workspace.Terrain.WaterWaveSpeed = 0
+    workspace.Terrain.WaterReflectance = 0
+    workspace.Terrain.WaterTransparency = 1
+end
+
+print("FPS Boost Activated – ลดเอฟเฟค เพิ่มความสว่าง ภาพไม่ขาว")
