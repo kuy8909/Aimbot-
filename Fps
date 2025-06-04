@@ -1,0 +1,16 @@
+for _, v in pairs(game:GetDescendants()) do
+    if v:IsA("Texture") or v:IsA("Decal") then
+        v.Transparency = 1 -- ซ่อน texture เพื่อประหยัด FPS
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+        v.Enabled = false -- ปิดเอฟเฟกต์
+    elseif v:IsA("SurfaceGui") or v:IsA("BillboardGui") then
+        v.Enabled = false
+    end
+end
+
+-- ปิด Shadows
+game.Lighting.GlobalShadows = false
+game.Lighting.FogEnd = 100000 -- ปิดหมอก
+
+-- ลดคุณภาพ Render
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
