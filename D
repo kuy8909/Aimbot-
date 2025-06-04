@@ -1,0 +1,32 @@
+-- 📌 Screen Shake (เบา ๆ)
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+local shakeDuration = 0.5 -- ระยะเวลาที่สั่น (วินาที)
+local shakeMagnitude = 0.3 -- ความแรงในการสั่น (0.1 - 1.0 แนะนำให้เบา ๆ)
+
+local function shakeCamera()
+    local startTime = tick()
+    local connection
+
+    local originalCFrame = Camera.CFrame
+
+    connection = RunService.RenderStepped:Connect(function()
+        local elapsed = tick() - startTime
+        if elapsed > shakeDuration then
+            connection:Disconnect()
+            Camera.CFrame = originalCFrame
+            return
+        end
+
+        local offset = Vector3.new(
+            (math.random() - 0.5) * 2 * shakeMagnitude,
+            (math.random() - 0.5) * 2 * shakeMagnitude,
+            (math.random() - 0.5) * 2 * shakeMagnitude
+        )
+        Camera.CFrame = originalCFrame * CFrame.new(offset)
+    end)
+end
+
+-- เรียกใช้งานฟังก์ชัน
+shakeCamera()
